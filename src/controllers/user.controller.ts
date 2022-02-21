@@ -1,28 +1,44 @@
-import User from '../models/user.model'
+import User from "../models/user.model";
 import express from "express";
 // const auth = require("../middleware/auth.middleware")
 
 export default {
   login: async (req: express.Request, res: express.Response) => {
     try {
-      const userName = req.body.userName;
-      const password = req.body.password;
-
-      const user = await User.findByCredentials(userName, password);
+      const username = req.body.data.username;
+      const password = req.body.data.password;
+      const user = await User.findByCredentials(username, password);
+      const reqData = {
+        requestId: req.body.requestId,
+        requestTime: req.body.requestTime,
+      }
       if (!user) {
-        return res
-          .status(401)
-          .send({ error: "Login failed! Check authentication credentials" });
+        return res.status(401).json({
+          code: "00009",
+          message: "Login failed! Check authentication credentials",
+          request: reqData,
+        });
       }
 
-      const { tokenDevices } = req.body;
-      const token = await user.generateAuthToken(tokenDevices);
+      const token = await user.generateAuthToken();
 
-      res.send({ user, token });
+      res.status(200).json({
+        code: "00000",
+        message: "success",
+        request: reqData,
+        data: { token },
+      });
     } catch (error) {
       // res.status(400).send(error);
       res.send({ error: true });
     }
   },
-
+  getById: async (req: express.Request, res: express.Response) => {
+    try {
+      const user = await User.findOne({_id: req.params.id})
+      res.json(user)
+    } catch (error) {
+      res.send({ error: true });
+    }
+  },
 };

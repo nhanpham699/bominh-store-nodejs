@@ -8,6 +8,7 @@ const Router = express_1.default.Router();
 const user_controller_1 = __importDefault(require("../controllers/user.controller"));
 // const authMiddleWare = require('../middleware/auth.middleware')
 Router.post("/login", user_controller_1.default.login);
+Router.get("/:id", user_controller_1.default.getById);
 // Router.post('/logout', authMiddleWare, controller.logout)
 exports.default = Router;
 //# sourceMappingURL=user.route.js.map

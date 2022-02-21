@@ -17,20 +17,39 @@ const user_model_1 = __importDefault(require("../models/user.model"));
 exports.default = {
     login: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const userName = req.body.userName;
-            const password = req.body.password;
-            const user = yield user_model_1.default.findByCredentials(userName, password);
+            const username = req.body.data.username;
+            const password = req.body.data.password;
+            const user = yield user_model_1.default.findByCredentials(username, password);
+            const reqData = {
+                requestId: req.body.requestId,
+                requestTime: req.body.requestTime,
+            };
             if (!user) {
-                return res
-                    .status(401)
-                    .send({ error: "Login failed! Check authentication credentials" });
+                return res.status(401).json({
+                    code: "00009",
+                    message: "Login failed! Check authentication credentials",
+                    request: reqData,
+                });
             }
-            const { tokenDevices } = req.body;
-            const token = yield user.generateAuthToken(tokenDevices);
-            res.send({ user, token });
+            const token = yield user.generateAuthToken();
+            res.status(200).json({
+                code: "00000",
+                message: "success",
+                request: reqData,
+                data: { token },
+            });
         }
         catch (error) {
             // res.status(400).send(error);
+            res.send({ error: true });
+        }
+    }),
+    getById: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const user = yield user_model_1.default.findOne({ _id: req.params.id });
+            res.json(user);
+        }
+        catch (error) {
             res.send({ error: true });
         }
     }),

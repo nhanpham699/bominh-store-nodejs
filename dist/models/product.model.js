@@ -14,5 +14,5 @@ const productSchema = new Schema({
 });
 // (mongoose as any).models = {}
 const Product = mongoose_1.default.model("Product", productSchema);
-module.exports = Product;
+exports.default = Product;
 //# sourceMappingURL=product.model.js.map
