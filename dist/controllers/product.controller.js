@@ -16,8 +16,13 @@ const product_model_1 = __importDefault(require("../models/product.model"));
 // const auth = require("../middleware/auth.middleware")
 exports.default = {
     getAll: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const products = yield product_model_1.default.find();
-        res.json(products);
+        try {
+            const products = yield product_model_1.default.find();
+            res.json(products);
+        }
+        catch (error) {
+            res.send(error);
+        }
     }),
     getById: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -25,7 +30,44 @@ exports.default = {
             res.json(product);
         }
         catch (error) {
-            res.send({ error: true });
+            res.send(error);
+        }
+    }),
+    create: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const product = new product_model_1.default(req.body);
+            yield product.save();
+            req.body._id = product._id.toString();
+            if (product) {
+                res.status(200).json(req.body);
+            }
+        }
+        catch (error) {
+            res.status(400).json(error);
+        }
+    }),
+    delete: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const products = yield product_model_1.default.deleteOne(req.body);
+            if (products) {
+                res.status(200).json({ success: true });
+            }
+        }
+        catch (error) {
+            res.status(400).json({ success: false });
+        }
+    }),
+    update: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const { _id } = req.body;
+            delete req.body._id;
+            const result = yield product_model_1.default.updateOne({ _id }, req.body);
+            if (result.acknowledged) {
+                res.status(200).json({ success: true });
+            }
+        }
+        catch (error) {
+            res.status(400).json({ success: false });
         }
     }),
 };

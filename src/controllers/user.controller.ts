@@ -4,14 +4,14 @@ import express from "express";
 
 export default {
   login: async (req: express.Request, res: express.Response) => {
+    const reqData = {
+      requestId: req.body.requestId,
+      requestTime: req.body.requestTime,
+    };
     try {
       const username = req.body.data.username;
       const password = req.body.data.password;
       const user = await User.findByCredentials(username, password);
-      const reqData = {
-        requestId: req.body.requestId,
-        requestTime: req.body.requestTime,
-      }
       if (!user) {
         return res.status(401).json({
           code: "00009",
@@ -29,14 +29,17 @@ export default {
         data: { token },
       });
     } catch (error) {
-      // res.status(400).send(error);
-      res.send({ error: true });
+      res.status(200).json({
+        code: "00099",
+        message: error.message,
+        request: reqData,
+      });
     }
   },
   getById: async (req: express.Request, res: express.Response) => {
     try {
-      const user = await User.findOne({_id: req.params.id})
-      res.json(user)
+      const user = await User.findOne({ _id: req.params.id });
+      res.json(user);
     } catch (error) {
       res.send({ error: true });
     }
